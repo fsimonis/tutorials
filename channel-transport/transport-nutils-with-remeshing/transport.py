@@ -9,10 +9,11 @@ import treelog as log
 import numpy as np
 import precice
 
+REFINEMENT_LIMITS=[2.0, 2.0]
 
 def reinitialize_namespace(domain, geom):
     # cloud of Gauss points
-    gauss = domain.sample("gauss", degree=2)
+    gauss = domain.sample("bezier", degree=2)
 
     # Nutils namespace
     ns = function.Namespace(fallback_length=2)
@@ -44,11 +45,11 @@ def refine_mesh(ns, domain_coarse, domain_nm1, solu_nm1):
     """
     # ----- Refine the coarse mesh according to the projected solution to get a predicted refined topology ----
     domain_ref = domain_coarse
-    for level in range(3):
+    for level, limit in enumerate(REFINEMENT_LIMITS):
         print("refinement level = {}".format(level))
         domain_union1 = domain_nm1 & domain_ref
         smpl = domain_union1.sample('uniform', 5)
-        ielem, criterion = smpl.eval([domain_ref.f_index, function.sqrt(ns.gradu[0]**2 + ns.gradu[1]**2) > 2.0],
+        ielem, criterion = smpl.eval([domain_ref.f_index, function.sqrt(ns.gradu[0]**2 + ns.gradu[1]**2) > limit],
                                      solu=solu_nm1)
 
         # Refine the elements for which at least one point tests true.
@@ -71,7 +72,7 @@ def main():
     print("Running Nutils")
 
     # Remeshing
-    n_remeshing = 10
+    n_remeshing = 2
 
     # define the Nutils mesh
     nx = 60
@@ -88,7 +89,7 @@ def main():
     domain_coarse = domain  # Retain the original coarse domain for mesh refinement later on
 
     # cloud of Gauss points
-    gauss = domain.sample("gauss", degree=2)
+    gauss = domain.sample("bezier", degree=2)
 
     # Nutils namespace
     ns = function.Namespace(fallback_length=2)
@@ -111,7 +112,7 @@ def main():
     sqr = domain.boundary["inflow"].integral("u^2 d:x" @ ns, degree=2)
     cons = solver.optimize("solu", sqr, droptol=1e-15)
 
-    timestep = 0
+    timestep = 1
     dt = 0.005
 
     # set blob as initial condition
@@ -120,10 +121,10 @@ def main():
 
     # Initial refinement according to initial condition
     print("Performing initial mesh refinement")
-    for level in range(3):
+    for level, limit in enumerate(REFINEMENT_LIMITS):
         print("refinement level = {}".format(level))
         smpl = domain.sample('uniform', 5)
-        ielem, criterion = smpl.eval([domain.f_index, function.sqrt(ns.gradu[0]**2 + ns.gradu[1]**2) > 2.0], solu=solu0)
+        ielem, criterion = smpl.eval([domain.f_index, function.sqrt(ns.gradu[0]**2 + ns.gradu[1]**2) > limit], solu=solu0)
 
         # Refine the elements for which at least one point tests true.
         domain = domain.refined_by(np.unique(ielem[criterion]))
@@ -142,6 +143,7 @@ def main():
     mesh_id = interface.get_mesh_id(mesh_name)
     vertices = gauss.eval(ns.x)
     vertex_ids = interface.set_mesh_vertices(mesh_id, vertices)
+
 
     # coupling data
     velocity_id = interface.get_data_id("Velocity", mesh_id)

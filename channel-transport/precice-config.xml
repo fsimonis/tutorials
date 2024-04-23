@@ -21,9 +21,7 @@
     <provide-mesh name="Fluid-Mesh" />
     <receive-mesh name="Transport-Mesh" from="Transport" />
     <write-data name="Velocity" mesh="Fluid-Mesh" />
-    <mapping:rbf direction="write" from="Fluid-Mesh" to="Transport-Mesh" constraint="consistent">
-      <basis-function:compact-tps-c2 support-radius="0.4" />
-    </mapping:rbf>
+    <mapping:nearest-neighbor direction="write" from="Fluid-Mesh" to="Transport-Mesh" constraint="consistent" />
   </participant>
 
   <participant name="Transport">
