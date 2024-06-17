@@ -4,6 +4,8 @@
 # Advection-Diffusion equation for a single species with a velocity field read from preCICE on the complete volume.
 #
 
+import setuptools as distutils
+
 from nutils import function, mesh, cli, solver, export
 import treelog as log
 import numpy as np
@@ -20,12 +22,12 @@ def main():
     ny = 32
     step_start = nx // 3
     step_end = nx // 2
-    step_hight = ny // 2
+    step_height = ny // 2
 
     grid = np.linspace(0, 6, nx + 1), np.linspace(0, 2, ny + 1)
     domain, geom = mesh.rectilinear(grid)
     domain = domain.withboundary(inflow="left", outflow="right", wall="top,bottom") - domain[
-        step_start:step_end, :step_hight
+        step_start:step_end, :step_height
     ].withboundary(wall="left,top,right")
 
     # cloud of Gauss points
