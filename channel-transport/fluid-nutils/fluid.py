@@ -10,7 +10,7 @@ import numpy as np
 import precice
 from mpi4py import MPI
 
-VISUALIZE = False
+VISUALIZE = True
 
 def main():
 

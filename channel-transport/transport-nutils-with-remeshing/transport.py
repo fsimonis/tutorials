@@ -11,7 +11,7 @@ import precice
 from mpi4py import MPI
 
 REFINEMENT_LIMITS=[2.0, 2.0]
-VISUALIZE = False
+VISUALIZE = True
 
 
 def reinitialize_namespace(domain, geom):
