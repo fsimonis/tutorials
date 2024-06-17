@@ -10,6 +10,7 @@ import numpy as np
 import precice
 from mpi4py import MPI
 
+VISUALIZE = False
 
 def main():
 
@@ -79,7 +80,7 @@ def main():
 
     while participant.is_coupling_ongoing():
 
-        if timestep % 1 == 0:  # visualize
+        if VISUALIZE and timestep % 1 == 0:  # visualize
             bezier = domain.sample("bezier", 2)
             x, u, p = bezier.eval(["x_i", "u_i", "p"] @ ns, **state)
             with log.add(log.DataLog()):
