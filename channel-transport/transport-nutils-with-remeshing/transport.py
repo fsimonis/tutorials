@@ -11,6 +11,8 @@ import precice
 from mpi4py import MPI
 
 REFINEMENT_LIMITS=[2.0, 2.0]
+VISUALIZE = False
+
 
 def reinitialize_namespace(domain, geom):
     # cloud of Gauss points
@@ -179,7 +181,7 @@ def main():
             participant.reset_mesh(mesh_name)  # Throws away the entire mesh
             vertex_ids = participant.set_mesh_vertices(mesh_name, vertices)  # Redefine the mesh
 
-        if timestep % 1 == 0:  # visualize
+        if VISUALIZE and timestep % 1 == 0:  # visualize
             bezier = domain.sample("bezier", 2)
             x, u = bezier.eval(["x_i", "u"] @ ns, lhs=solu)
             with log.add(log.DataLog()):
