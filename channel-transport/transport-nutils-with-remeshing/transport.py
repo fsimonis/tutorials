@@ -25,7 +25,7 @@ def reinitialize_namespace(domain, geom):
     ns.u = "basis_n ?lhs_n"  # solution
     ns.projectedu = "basis_n ?projectedlhs_n"
     ns.gradu = "u_,i"  # gradient of lhstion
-    ns.dudt = "basis_n (?lhs_n - ?solu0_n) / ?dt"  # time derivative
+    ns.dudt = "basis_n (?lhs_n - ?lhs0_n) / ?dt"  # time derivative
     ns.vbasis = gauss.basis()
     ns.velocity_i = "vbasis_n ?velocity_ni"
     ns.k = 0.1  # diffusivity
@@ -53,7 +53,7 @@ def refine_mesh(ns, domain_coarse, domain_nm1, lhs_nm1):
         domain_union1 = domain_nm1 & domain_ref
         smpl = domain_union1.sample('uniform', 5)
         ielem, criterion = smpl.eval([domain_ref.f_index, function.sqrt(ns.gradu[0]**2 + ns.gradu[1]**2) > limit],
-                                     lhs=solu_nm1)
+                                     lhs=lhs_nm1)
 
         # Refine the elements for which at least one point tests true.
         domain_ref = domain_ref.refined_by(np.unique(ielem[criterion]))
@@ -65,7 +65,7 @@ def refine_mesh(ns, domain_coarse, domain_nm1, lhs_nm1):
     # ----- Project the lhstion of the last time step on the projection mesh -----
     ns.projectedu = function.dotarg('projectedlhs', domain_ref.basis('h-std', degree=1))
     sqru = domain_union.integral((ns.projectedu - ns.u) ** 2, degree=2)
-    lhs = solver.optimize('projectedsolu', sqru, droptol=1E-12, arguments=dict(solu=solu_nm1))
+    lhs = solver.optimize('projectedlhs', sqru, droptol=1E-12, arguments=dict(lhs=lhs_nm1))
 
     return domain_ref, lhs
 
@@ -174,7 +174,7 @@ def main():
         )
 
         if timestep % n_remeshing == 0:
-            domain, lhs = refine_mesh(ns, domain_coarse, domain, solu)
+            domain, lhs = refine_mesh(ns, domain_coarse, domain, lhs)
             ns, res, cons, gauss = reinitialize_namespace(domain, geom)
 
             vertices = gauss.eval(ns.x)
@@ -183,7 +183,7 @@ def main():
 
         if VISUALIZE and timestep % 1 == 0:  # visualize
             bezier = domain.sample("bezier", 2)
-            x, u = bezier.eval(["x_i", "u"] @ ns, lhs=solu)
+            x, u = bezier.eval(["x_i", "u"] @ ns, lhs=lhs)
             with log.add(log.DataLog()):
                 export.vtk("Transport_" + str(timestep), bezier.tri, x, T=u)
 
