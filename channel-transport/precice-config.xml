@@ -34,7 +34,7 @@
   <coupling-scheme:parallel-explicit>
     <time-window-size value="0.005" />
     <!--max-time value="1.0" /-->
-    <max-time-windows value="10" />
+    <max-time-windows value="100" />
     <participants first="Fluid" second="Transport" />
     <exchange data="Velocity" mesh="Transport-Mesh" from="Fluid" to="Transport" />
   </coupling-scheme:parallel-explicit>
