@@ -19,14 +19,16 @@
 
   <participant name="Fluid">
     <provide-mesh name="Fluid-Mesh" />
-    <receive-mesh name="Transport-Mesh" from="Transport" />
     <write-data name="Velocity" mesh="Fluid-Mesh" />
-    <mapping:nearest-neighbor direction="write" from="Fluid-Mesh" to="Transport-Mesh" constraint="consistent" />
+
   </participant>
 
   <participant name="Transport">
     <provide-mesh name="Transport-Mesh" />
     <read-data name="Velocity" mesh="Transport-Mesh" />
+
+    <receive-mesh name="Fluid-Mesh" from="Fluid" />
+    <mapping:nearest-neighbor direction="read" from="Fluid-Mesh" to="Transport-Mesh" constraint="consistent" />
   </participant>
 
   <m2n:sockets acceptor="Fluid" connector="Transport" exchange-directory=".." />
@@ -34,8 +36,8 @@
   <coupling-scheme:parallel-explicit>
     <time-window-size value="0.005" />
     <!--max-time value="1.0" /-->
-    <max-time-windows value="100" />
+    <max-time-windows value="20" />
     <participants first="Fluid" second="Transport" />
-    <exchange data="Velocity" mesh="Transport-Mesh" from="Fluid" to="Transport" />
+    <exchange data="Velocity" mesh="Fluid-Mesh" from="Fluid" to="Transport" />
   </coupling-scheme:parallel-explicit>
 </precice-configuration>
