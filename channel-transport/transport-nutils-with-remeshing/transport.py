@@ -10,7 +10,8 @@ import numpy as np
 import precice
 from mpi4py import MPI
 
-REFINEMENT_LIMITS=[2.0, 2.0]
+REFINEMENT_LIMITS=[1.0, 2.0]
+REFINEMENT_FREQUENCY=2
 VISUALIZE = True
 
 
@@ -74,12 +75,9 @@ def main():
 
     print("Running Nutils")
 
-    # Remeshing
-    n_remeshing = 2
-
     # define the Nutils mesh
-    nx = 120
-    ny = 32
+    nx = 60 #120
+    ny = 16 #32
     step_start = nx // 3
     step_end = nx // 2
     step_height = ny // 2
@@ -173,7 +171,7 @@ def main():
             "lhs", res, constrain=cons, arguments=dict(lhs0=lhs0, dt=dt, velocity=velocity_values)
         )
 
-        if timestep % n_remeshing == 0:
+        if timestep % REFINEMENT_FREQUENCY == 0:
             domain, lhs = refine_mesh(ns, domain_coarse, domain, lhs)
             ns, res, cons, gauss = reinitialize_namespace(domain, geom)
 
