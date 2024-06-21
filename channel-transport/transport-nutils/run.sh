@@ -8,6 +8,8 @@ set -e -u
 #. .venv/bin/activate
 #pip install -r requirements.txt
 
+export OMP_NUM_THREADS=1 NUTILS_NPROCS=4
+
 python3 transport.py
 
 
