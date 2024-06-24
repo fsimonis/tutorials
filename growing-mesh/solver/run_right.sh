@@ -1,4 +1,8 @@
 #!/bin/sh
 set -e -u
 
-python3 solver.py Right
+if [ $# -eq 0 ]; then
+  python3 solver.py Right
+else
+  mpirun -n $@ python3 solver.py Right
+fi
