@@ -6,8 +6,15 @@ import math
 import sys
 from mpi4py import MPI
 
-participant_name = sys.argv[1]
-assert participant_name in ["Left", "Right"], "Participant must be Left or Right"
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("participant", choices=["Left", "Right"])
+parser.add_argument("--config", "-c", default="../precice-config.xml")
+parser.add_argument("--no-remesh", dest="remesh", action="store_false")
+args = parser.parse_args()
+
+participant_name = args.participant
 
 # x is partitioned per rank and doesn't change
 nx = 256 * 3
@@ -74,7 +81,7 @@ def getMeshAtTimeWindow(tw):
     return np.reshape([ (x, y, z) for z in zs for y in ys for x in xs ], (-1, 3))
 
 
-participant = precice.Participant(participant_name, "../precice-config.xml", rank, size)
+participant = precice.Participant(participant_name, args.config, rank, size)
 
 mesh_name = participant_name+"-Mesh"
 data_name = "Data"
@@ -92,7 +99,7 @@ while participant.is_coupling_ongoing():
         if rank == 0:
             print(data)
 
-    if requiresEvent(tw):
+    if args.remesh and requiresEvent(tw):
         oldCount = len(coords)
         coords = getMeshAtTimeWindow(tw)
         if rank == 0:
