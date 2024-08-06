@@ -8,30 +8,37 @@
   </log>
   <profiling mode="all" />
 
-  <data:scalar name="Data" />
+  <data:scalar name="Data-Left" />
+  <data:scalar name="Data-Right" />
 
   <mesh name="Left-Mesh" dimensions="3">
-    <use-data name="Data" />
+    <use-data name="Data-Left" />
+    <use-data name="Data-Right" />
   </mesh>
 
   <mesh name="Right-Mesh" dimensions="3">
-    <use-data name="Data" />
+    <use-data name="Data-Left" />
+    <use-data name="Data-Right" />
   </mesh>
 
   <participant name="Left">
     <provide-mesh name="Left-Mesh" />
-    <write-data name="Data" mesh="Left-Mesh" />
 
+    <write-data name="Data-Left" mesh="Left-Mesh" />
+    <read-data name="Data-Right" mesh="Left-Mesh" />
+
+    <receive-mesh name="Right-Mesh" from="Right" />
+    <mapping:nearest-neighbor direction="read" from="Right-Mesh" to="Left-Mesh" constraint="consistent" />
   </participant>
 
   <participant name="Right">
     <provide-mesh name="Right-Mesh" />
-    <read-data name="Data" mesh="Right-Mesh" />
+
+    <read-data name="Data-Left" mesh="Right-Mesh" />
+    <write-data name="Data-Right" mesh="Right-Mesh" />
 
     <receive-mesh name="Left-Mesh" from="Left" />
     <mapping:nearest-neighbor direction="read" from="Left-Mesh" to="Right-Mesh" constraint="consistent" />
-
-    <export:vtk directory="out" />
   </participant>
 
   <m2n:sockets acceptor="Left" connector="Right" exchange-directory=".." />
@@ -40,6 +47,7 @@
     <time-window-size value="1" />
     <max-time-windows value="12" />
     <participants first="Left" second="Right" />
-    <exchange data="Data" mesh="Left-Mesh" from="Left" to="Right" />
+    <exchange data="Data-Left" mesh="Left-Mesh" from="Left" to="Right" />
+    <exchange data="Data-Right" mesh="Right-Mesh" from="Right" to="Left" />
   </coupling-scheme:parallel-explicit>
 </precice-configuration>

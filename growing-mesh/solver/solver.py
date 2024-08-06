@@ -15,6 +15,7 @@ parser.add_argument("--no-remesh", dest="remesh", action="store_false")
 args = parser.parse_args()
 
 participant_name = args.participant
+remote_name = "Left" if participant_name == "Right" else "Right"
 
 # x is partitioned per rank and doesn't change
 nx = 256 * 3
@@ -84,7 +85,8 @@ def getMeshAtTimeWindow(tw):
 participant = precice.Participant(participant_name, args.config, rank, size)
 
 mesh_name = participant_name+"-Mesh"
-data_name = "Data"
+read_data_name = "Data-" + remote_name
+write_data_name = "Data-" + participant_name
 
 coords = getMeshAtTimeWindow(0)
 vertex_ids = participant.set_mesh_vertices(mesh_name, coords)
@@ -94,10 +96,9 @@ tw = 1
 while participant.is_coupling_ongoing():
     dt = participant.get_max_time_step_size()
 
-    if participant_name == "Right":
-        data = participant.read_data(mesh_name, data_name, vertex_ids, dt)
-        if rank == 0:
-            print(data)
+    data = participant.read_data(mesh_name, read_data_name, vertex_ids, dt)
+    if rank == 0:
+        print(data)
 
     if args.remesh and requiresEvent(tw):
         oldCount = len(coords)
@@ -107,9 +108,8 @@ while participant.is_coupling_ongoing():
         participant.reset_mesh(mesh_name)
         vertex_ids = participant.set_mesh_vertices(mesh_name, coords)
 
-    if participant_name == "Left":
-        data = np.full(len(coords), tw)
-        participant.write_data(mesh_name, data_name, vertex_ids, data)
+    data = np.full(len(coords), tw)
+    participant.write_data(mesh_name, write_data_name, vertex_ids, data)
 
     participant.advance(dt)
     tw += 1
