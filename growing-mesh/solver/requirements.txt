@@ -1,0 +1,2 @@
+mpi4py
+pyprecice @ git+https://github.com/precice/python-bindings.git@develop
