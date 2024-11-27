@@ -9,13 +9,13 @@ from mpi4py import MPI
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("participant", choices=["Left", "Right"])
+parser.add_argument("participant", choices=["A", "B"])
 parser.add_argument("--config", "-c", default="../precice-config.xml")
 parser.add_argument("--no-remesh", dest="remesh", action="store_false")
 args = parser.parse_args()
 
 participant_name = args.participant
-remote_name = "Left" if participant_name == "Right" else "Right"
+remote_name = "A" if participant_name == "B" else "B"
 
 # x is partitioned per rank and doesn't change
 nx = 256 * 3

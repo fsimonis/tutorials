@@ -6,7 +6,7 @@ python3 -m venv .venvr
 pip install -r requirements.txt
 
 if [ $# -eq 0 ]; then
-  python3 solver.py Right
+  python3 solver.py B
 else
-  mpirun -n "$@" python3 solver.py Right
+  mpirun -n "$@" python3 solver.py B
 fi
