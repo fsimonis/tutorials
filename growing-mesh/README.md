@@ -11,6 +11,12 @@ Get the [case files of this tutorial](https://github.com/precice/tutorials/tree/
 
 ## Setup
 
+The problem consists of a unit-square uniformly discretized by 768 x 768 nodes.
+Running in parallel is only allowed for $n^2, \exists n in \mathbb{N}$.
+The unit square is partitioned equally among the ranks of a solver.
+
+The mesh starts with 2 nodes in z direction and at a given frequency, 2 nodes are added to the mesh, changing only the load per rank, not the partitioning.
+
 ## Configuration
 
 preCICE configuration (image generated using the [precice-config-visualizer](https://precice.org/tooling-config-visualization.html)):
