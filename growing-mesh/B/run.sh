@@ -3,7 +3,7 @@ set -e -u
 
 python3 -m venv .venv
 . .venv/bin/activate
-pip install ../solver
+pip install ../solver-python
 
 if [ $# -eq 0 ]; then
   growing B
