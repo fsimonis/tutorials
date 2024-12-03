@@ -31,13 +31,13 @@ Not passing a number, runs the simulation on a single rank.
 To run both on a two rank each, use:
 
 ```bash
-cd fluid-cpp
+cd A
 ./run.sh 2
 ```
 
 and
 
 ```bash
-cd solid-cpp
+cd B
 ./run.sh 2
 ```
